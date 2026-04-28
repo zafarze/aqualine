@@ -32,7 +32,8 @@
       "Bash(awk '{print $4}')",
       "Bash(xargs -I{} du -b \"{}\")",
       "Bash(xargs -0 du -ch)",
-      "Bash(git remote *)"
+      "Bash(git remote *)",
+      "WebFetch(domain:firebase.google.com)"
     ]
   }
 }

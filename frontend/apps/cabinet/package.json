@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@aqualine/ui": "*",
+    "@aqualine/ui": "file:../../packages/ui",
     "lucide-react": "^0.460.0",
     "next": "15.0.3",
     "react": "18.3.1",

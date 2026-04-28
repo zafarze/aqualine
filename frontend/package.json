@@ -1,20 +1,16 @@
 {
   "name": "aqualine-frontend",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "concurrently -k -n crm,cabinet -c blue,magenta \"npm run dev -w crm\" \"npm run dev -w cabinet\"",
-    "dev:crm": "npm run dev -w crm",
-    "dev:cabinet": "npm run dev -w cabinet",
-    "build": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "dev": "concurrently -k -n crm,cabinet -c blue,magenta \"npm run dev --prefix apps/crm\" \"npm run dev --prefix apps/cabinet\"",
+    "dev:crm": "npm run dev --prefix apps/crm",
+    "dev:cabinet": "npm run dev --prefix apps/cabinet",
+    "build:crm": "npm run build --prefix apps/crm",
+    "build:cabinet": "npm run build --prefix apps/cabinet",
+    "build": "npm run build:crm && npm run build:cabinet",
+    "install:all": "npm install --prefix apps/crm && npm install --prefix apps/cabinet"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0",
-    "typescript": "^5.6.3"
+    "concurrently": "^9.1.0"
   }
 }
