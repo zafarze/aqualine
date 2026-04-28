@@ -2,6 +2,14 @@ export { cn } from "./lib/cn";
 export { Card } from "./components/Card";
 export { Sidebar } from "./components/Sidebar";
 export { Header } from "./components/Header";
+export type {
+  HeaderUser,
+  HeaderSearchType,
+  HeaderSearchItem,
+  HeaderNotificationTone,
+  HeaderNotificationItem,
+  HeaderNotificationsResponse,
+} from "./components/Header";
 export { StatDonut } from "./components/StatDonut";
 export { BarsCard } from "./components/BarsCard";
 export { MiniArea } from "./components/MiniArea";

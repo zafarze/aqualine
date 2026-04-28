@@ -27,7 +27,12 @@
       "Bash(.venv/Scripts/python.exe -c \"from apps.notifications.tasks import send_web_push, _send_chunk; print\\('OK'\\)\")",
       "Bash(git -C \"d:/Projects/AquaLine\" config user.name)",
       "Bash(git -C \"d:/Projects/AquaLine\" config user.email)",
-      "Bash(git init *)"
+      "Bash(git init *)",
+      "Bash(grep -iE \"\\(^|/\\)\\\\.env\\(\\\\.|$\\)\")",
+      "Bash(awk '{print $4}')",
+      "Bash(xargs -I{} du -b \"{}\")",
+      "Bash(xargs -0 du -ch)",
+      "Bash(git remote *)"
     ]
   }
 }

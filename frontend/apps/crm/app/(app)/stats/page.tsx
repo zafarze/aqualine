@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, LineChart, PieChart, Target, Users } from "lucide-react";
+import {
+  BarChart3,
+  LineChart,
+  PieChart,
+  Target,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import {
   BarsCard,
   Breadcrumbs,
@@ -44,7 +51,7 @@ function CardShell({
 }: {
   title: string;
   subtitle?: string;
-  icon?: React.ComponentType<{ size?: number; className?: string }>;
+  icon?: LucideIcon;
   children: React.ReactNode;
 }) {
   return (

@@ -1,0 +1,25 @@
+# Firebase App Hosting config for AquaLine CRM (Next.js 15 App Router)
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  cpu: 1
+  memoryMiB: 512
+  maxInstances: 5
+  minInstances: 0
+  concurrency: 80
+  timeoutSeconds: 60
+
+env:
+  # Базовый URL Django API — будет перезаписан реальным Cloud Run URL на шаге 3
+  - variable: NEXT_PUBLIC_API_URL
+    value: https://api-aqualine-placeholder.example.com/api
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # VAPID public key для Web Push — выставите после генерации на backend
+  - variable: NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    value: ""
+    availability:
+      - BUILD
+      - RUNTIME

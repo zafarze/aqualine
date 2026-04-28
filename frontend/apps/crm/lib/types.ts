@@ -238,6 +238,7 @@ export interface CurrentUser {
   role: UserRole;
   role_display: string;
   phone: string;
+  photo: string | null;
 }
 
 // ─── Dashboard ───────────────────────────────────────────────────────────
