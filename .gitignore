@@ -1,0 +1,76 @@
+# ---------- Node / Next.js ----------
+node_modules/
+.next/
+.turbo/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---------- Python / Django ----------
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+mediafiles/
+media/
+*.egg-info/
+.eggs/
+
+# ---------- Environment ----------
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+!.env.example
+
+# ---------- Logs ----------
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---------- Testing / Coverage ----------
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+
+# ---------- IDE / OS ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Deploy / Cloud ----------
+.firebase/
+.firebaserc.local
+firebase-debug.log
+.vercel/
+.gcloudignore.local
+*.pem
+*.key
+service-account*.json
+gcp-key*.json
+
+# ---------- Misc ----------
+*.bak
+*.tmp
+.cache/
