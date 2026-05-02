@@ -1,7 +1,10 @@
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
 
@@ -52,6 +55,11 @@ class Order(models.Model):
     def __str__(self) -> str:
         return self.number or f"#{self.pk}"
 
+    def clean(self) -> None:
+        super().clean()
+        if self.due_date and self.due_date < timezone.localdate():
+            raise ValidationError({"due_date": "Срок не может быть в прошлом."})
+
     def save(self, *args, **kwargs) -> None:
         is_new = self.pk is None
         super().save(*args, **kwargs)
@@ -80,13 +88,28 @@ class OrderItem(models.Model):
         verbose_name="Товар",
     )
     quantity = models.DecimalField(
-        "Количество", max_digits=12, decimal_places=2, default=Decimal("1")
+        "Количество",
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("1"),
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     price = models.DecimalField(
-        "Цена", max_digits=12, decimal_places=2, default=Decimal("0")
+        "Цена",
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0"),
+        validators=[MinValueValidator(Decimal("0"))],
     )
     discount = models.DecimalField(
-        "Скидка %", max_digits=5, decimal_places=2, default=Decimal("0")
+        "Скидка %",
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0"),
+        validators=[
+            MinValueValidator(Decimal("0")),
+            MaxValueValidator(Decimal("100")),
+        ],
     )
 
     class Meta:

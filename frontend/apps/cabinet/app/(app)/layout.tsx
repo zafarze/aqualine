@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { isAuthenticated, logout } from "../../lib/api";
-import { readCart } from "../../lib/cart";
+import { CART_EVENT, getCart } from "../../lib/cart";
 import { InstallButton } from "../../lib/InstallButton";
 import { PushToggle } from "../../lib/PushToggle";
 
@@ -29,11 +29,16 @@ export default function CabinetAppLayout({
       router.replace("/login");
       return;
     }
-    const update = () =>
-      setCartCount(readCart().reduce((s, i) => s + i.quantity, 0));
+    const update = () => {
+      getCart()
+        .then((c) =>
+          setCartCount(c.items.reduce((s, i) => s + Number(i.quantity), 0))
+        )
+        .catch(() => setCartCount(0));
+    };
     update();
-    window.addEventListener("cart:change", update);
-    return () => window.removeEventListener("cart:change", update);
+    window.addEventListener(CART_EVENT, update);
+    return () => window.removeEventListener(CART_EVENT, update);
   }, [router]);
 
   return (

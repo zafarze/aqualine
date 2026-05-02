@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 
 from apps.finance.serializers import PaymentSerializer
@@ -69,6 +70,16 @@ class OrderSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["number", "created_at", "updated_at"]
+
+    def validate_due_date(self, value):
+        if value and value < timezone.localdate():
+            raise serializers.ValidationError("Срок не может быть в прошлом.")
+        return value
+
+    def validate_items(self, value):
+        if not value:
+            raise serializers.ValidationError("Заказ должен содержать хотя бы одну позицию.")
+        return value
 
     def get_manager_name(self, obj: Order) -> str:
         if obj.manager_id is None:

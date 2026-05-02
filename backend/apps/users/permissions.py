@@ -43,7 +43,10 @@ class IsStaffRole(BasePermission):
         user = request.user
         if not user or not user.is_authenticated:
             return False
-        return getattr(user, "role", None) != "client" or user.is_superuser
+        if user.is_superuser:
+            return True
+        from apps.users.models import User as UserModel
+        return getattr(user, "role", None) != UserModel.Role.CLIENT
 
 
 class IsCabinetClient(BasePermission):
@@ -53,7 +56,8 @@ class IsCabinetClient(BasePermission):
         user = request.user
         if not user or not user.is_authenticated:
             return False
-        return getattr(user, "role", None) == "client"
+        from apps.users.models import User as UserModel
+        return getattr(user, "role", None) == UserModel.Role.CLIENT
 
 
 class CanManageProducts(HasRole):

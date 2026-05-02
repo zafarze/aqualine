@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 
+from apps.users.scoping import ManagerScopedQuerysetMixin
+
 from .models import Client, ClientInteraction, ClientTag, ClientTask
 from .serializers import (
     ClientInteractionSerializer,
@@ -9,7 +11,7 @@ from .serializers import (
 )
 
 
-class ClientViewSet(viewsets.ModelViewSet):
+class ClientViewSet(ManagerScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = Client.objects.select_related("manager").prefetch_related("tags").all()
     serializer_class = ClientSerializer
     filterset_fields = ["type", "segment", "status", "manager"]

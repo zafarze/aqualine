@@ -22,6 +22,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ) {
     const auto = useId();
     const selectId = id ?? auto;
+    const errorId = error ? `${selectId}-error` : undefined;
     return (
       <div className="block">
         {label ? (
@@ -35,12 +36,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           id={selectId}
+          aria-invalid={error ? "true" : undefined}
+          aria-describedby={errorId}
           {...rest}
           className={cn(
             "w-full h-11 px-4 rounded-neu bg-surface text-ink shadow-neu-in outline-none appearance-none",
             "bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22none%22 stroke=%22%236B6890%22 stroke-width=%221.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22M3 4.5l3 3 3-3%22/></svg>')]",
             "bg-no-repeat bg-[right_1rem_center] pr-9",
-            "focus:ring-2 focus:ring-accent-violet/40",
+            "focus-visible:ring-2 focus-visible:ring-accent-violet/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
             error && "ring-2 ring-accent-pink",
             className,
           )}
@@ -57,7 +60,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
         {error ? (
-          <span className="block text-xs text-accent-pink mt-1">{error}</span>
+          <span id={errorId} role="alert" className="block text-xs text-accent-pink mt-1">
+            {error}
+          </span>
         ) : null}
       </div>
     );

@@ -49,6 +49,19 @@ export const CLIENT_STATUS_OPTIONS: { value: ClientStatus; label: string }[] = [
   { value: "blocked", label: "Заблокирован" },
 ];
 
+export type ClientInteractionChannel = "call" | "meeting" | "email" | "messenger" | "other";
+
+export interface ClientInteraction {
+  id: number;
+  client: number;
+  channel: ClientInteractionChannel;
+  summary: string;
+  details: string;
+  user: number | null;
+  occurred_at: string;
+  created_at: string;
+}
+
 // ─── Products ─────────────────────────────────────────────────────────────
 
 export type ProductUnit = "pcs" | "m" | "kg" | "l" | "pack";
@@ -117,7 +130,7 @@ export interface Order {
   due_date: string | null;
   notes: string;
   items: OrderItem[];
-  payments?: unknown[];
+  payments?: Payment[];
   paid_amount?: string;
   balance_due?: string;
   total: string;

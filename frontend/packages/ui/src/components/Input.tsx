@@ -12,6 +12,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   function Input({ label, error, className, id, ...rest }, ref) {
     const auto = useId();
     const inputId = id ?? auto;
+    const errorId = error ? `${inputId}-error` : undefined;
     return (
       <div className="block">
         {label ? (
@@ -25,16 +26,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          aria-invalid={error ? "true" : undefined}
+          aria-describedby={errorId}
           {...rest}
           className={cn(
             "w-full h-11 px-4 rounded-neu bg-surface text-ink shadow-neu-in outline-none placeholder:text-ink-dim",
-            "focus:ring-2 focus:ring-accent-violet/40",
+            "focus-visible:ring-2 focus-visible:ring-accent-violet/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
             error && "ring-2 ring-accent-pink",
             className,
           )}
         />
         {error ? (
-          <span className="block text-xs text-accent-pink mt-1">{error}</span>
+          <span id={errorId} role="alert" className="block text-xs text-accent-pink mt-1">
+            {error}
+          </span>
         ) : null}
       </div>
     );

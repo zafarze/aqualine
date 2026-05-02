@@ -1,58 +1,73 @@
 "use client";
-
-const CART_KEY = "aqualine.cabinet.cart";
+import { api } from "./api";
 
 export interface CartItem {
-  product_id: number;
-  sku: string;
-  name: string;
+  id: number;
+  product: number;
+  product_name: string;
+  product_sku: string;
+  product_unit: string;
   price: string;
   quantity: number;
+  sum: string;
 }
 
-export function readCart(): CartItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(CART_KEY);
-    return raw ? (JSON.parse(raw) as CartItem[]) : [];
-  } catch {
-    return [];
+export interface Cart {
+  id: number;
+  items: CartItem[];
+  total: string;
+  updated_at: string;
+}
+
+export const CART_EVENT = "cart:change";
+
+function notify() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(CART_EVENT));
   }
 }
 
-export function writeCart(items: CartItem[]): void {
-  window.localStorage.setItem(CART_KEY, JSON.stringify(items));
-  window.dispatchEvent(new CustomEvent("cart:change"));
+export async function getCart(): Promise<Cart> {
+  return api<Cart>("/cart/");
 }
 
-export function addToCart(item: CartItem): void {
-  const cart = readCart();
-  const existing = cart.find((c) => c.product_id === item.product_id);
-  if (existing) {
-    existing.quantity += item.quantity;
-  } else {
-    cart.push(item);
-  }
-  writeCart(cart);
+export async function addToCart(productId: number, quantity = 1): Promise<void> {
+  if (quantity <= 0) throw new Error("Количество должно быть больше нуля");
+  await api("/cart/items/", {
+    method: "POST",
+    body: JSON.stringify({ product: productId, quantity }),
+  });
+  notify();
 }
 
-export function removeFromCart(productId: number): void {
-  writeCart(readCart().filter((c) => c.product_id !== productId));
+export async function updateQuantity(itemId: number, quantity: number): Promise<void> {
+  if (quantity <= 0) throw new Error("Количество должно быть больше нуля");
+  await api(`/cart/items/${itemId}/`, {
+    method: "PATCH",
+    body: JSON.stringify({ quantity }),
+  });
+  notify();
 }
 
-export function clearCart(): void {
-  writeCart([]);
+export async function removeFromCart(itemId: number): Promise<void> {
+  await api(`/cart/items/${itemId}/`, { method: "DELETE" });
+  notify();
 }
 
-export function setQuantity(productId: number, qty: number): void {
-  const cart = readCart();
-  const it = cart.find((c) => c.product_id === productId);
-  if (it) {
-    it.quantity = qty;
-    writeCart(cart);
-  }
+export async function clearCart(): Promise<void> {
+  await api("/cart/clear/", { method: "POST" });
+  notify();
 }
 
-export function cartTotal(items: CartItem[]): number {
-  return items.reduce((sum, it) => sum + Number(it.price) * it.quantity, 0);
+export async function checkout(notes = ""): Promise<{ order_id: number; number: string }> {
+  const result = await api<{ order_id: number; number: string }>("/cart/checkout/", {
+    method: "POST",
+    body: JSON.stringify({ notes }),
+  });
+  notify();
+  return result;
+}
+
+export function cartTotal(cart: Cart | null): number {
+  return cart ? Number(cart.total) : 0;
 }

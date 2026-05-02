@@ -1,7 +1,10 @@
 from decimal import Decimal
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from simple_history.models import HistoricalRecords
+
+NON_NEGATIVE = [MinValueValidator(Decimal("0"))]
 
 
 class Product(models.Model):
@@ -18,20 +21,25 @@ class Product(models.Model):
         "Ед. изм.", max_length=10, choices=Unit.choices, default=Unit.PIECE
     )
     purchase_price = models.DecimalField(
-        "Закупочная цена", max_digits=12, decimal_places=2, default=Decimal("0")
+        "Закупочная цена", max_digits=12, decimal_places=2,
+        default=Decimal("0"), validators=NON_NEGATIVE,
     )
     sale_price = models.DecimalField(
-        "Розничная цена", max_digits=12, decimal_places=2, default=Decimal("0")
+        "Розничная цена", max_digits=12, decimal_places=2,
+        default=Decimal("0"), validators=NON_NEGATIVE,
     )
     stock = models.DecimalField(
-        "Остаток", max_digits=12, decimal_places=2, default=Decimal("0")
+        "Остаток", max_digits=12, decimal_places=2,
+        default=Decimal("0"), validators=NON_NEGATIVE,
     )
     reserved = models.DecimalField(
-        "Резерв", max_digits=12, decimal_places=2, default=Decimal("0"),
+        "Резерв", max_digits=12, decimal_places=2,
+        default=Decimal("0"), validators=NON_NEGATIVE,
         help_text="Зарезервировано под подтверждённые заказы",
     )
     min_stock = models.DecimalField(
-        "Мин. остаток", max_digits=12, decimal_places=2, default=Decimal("0"),
+        "Мин. остаток", max_digits=12, decimal_places=2,
+        default=Decimal("0"), validators=NON_NEGATIVE,
         help_text="Триггер для уведомления о пополнении",
     )
     barcode = models.CharField(

@@ -11,13 +11,30 @@ env = environ.Env(
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
-SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-do-not-use-in-prod")
-DEBUG = env.bool("DJANGO_DEBUG", default=True)
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
+
+# В DEBUG допускаем dev-default; в проде SECRET_KEY обязателен.
+if DEBUG:
+    SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-do-not-use-in-prod")
+else:
+    SECRET_KEY = env("DJANGO_SECRET_KEY")
+    if not SECRET_KEY or SECRET_KEY == "dev-only-do-not-use-in-prod":
+        raise environ.ImproperlyConfigured(
+            "DJANGO_SECRET_KEY must be set to a secure value when DJANGO_DEBUG=False"
+        )
+
 ALLOWED_HOSTS = [
     h.strip()
-    for h in env("DJANGO_ALLOWED_HOSTS", default="*").split(",")
+    for h in env("DJANGO_ALLOWED_HOSTS", default="").split(",")
     if h.strip()
 ]
+if not DEBUG:
+    if not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS:
+        raise environ.ImproperlyConfigured(
+            "DJANGO_ALLOWED_HOSTS must list explicit hosts (no '*') when DJANGO_DEBUG=False"
+        )
+elif not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -45,6 +62,7 @@ INSTALLED_APPS = [
     "apps.settings_app",
     "apps.notifications",
     "apps.documents",
+    "apps.cart",
 ]
 
 MIDDLEWARE = [
@@ -166,6 +184,24 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # simple_history
 SIMPLE_HISTORY_REVERT_DISABLED = False
+
+# --- Security hardening (active when DEBUG=False) ---
+if not DEBUG:
+    SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = env.int("DJANGO_SECURE_HSTS_SECONDS", default=31536000)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    CSRF_TRUSTED_ORIGINS = [
+        o.strip()
+        for o in env("CSRF_TRUSTED_ORIGINS", default="").split(",")
+        if o.strip()
+    ]
 
 # Web Push (VAPID)
 VAPID_PUBLIC_KEY = env("VAPID_PUBLIC_KEY", default="")

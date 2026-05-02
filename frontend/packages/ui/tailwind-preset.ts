@@ -1,30 +1,33 @@
 import type { Config } from "tailwindcss";
 
+const rgbVar = (name: string) => `rgb(var(--color-${name}) / <alpha-value>)`;
+
 const preset = {
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         bg: {
-          DEFAULT: "#6C5CE7",
-          deep: "#5A4DD1",
-          dark: "#4A3FB8",
+          DEFAULT: rgbVar("bg"),
+          deep: rgbVar("bg-deep"),
+          dark: rgbVar("bg-dark"),
         },
         surface: {
-          DEFAULT: "#ECEEF5",
-          soft: "#F4F6FB",
-          dim: "#DDE1ED",
+          DEFAULT: rgbVar("surface"),
+          soft: rgbVar("surface-soft"),
+          dim: rgbVar("surface-dim"),
         },
         accent: {
-          violet: "#8E7CF8",
-          pink: "#FF6B9D",
-          green: "#5DD9A8",
-          yellow: "#F5C24A",
-          mint: "#56C9C0",
+          violet: rgbVar("accent-violet"),
+          pink: rgbVar("accent-pink"),
+          green: rgbVar("accent-green"),
+          yellow: rgbVar("accent-yellow"),
+          mint: rgbVar("accent-mint"),
         },
         ink: {
-          DEFAULT: "#2E2A55",
-          soft: "#6B6890",
-          dim: "#9A98B5",
+          DEFAULT: rgbVar("ink"),
+          soft: rgbVar("ink-soft"),
+          dim: rgbVar("ink-dim"),
         },
       },
       borderRadius: {
@@ -33,12 +36,9 @@ const preset = {
         "neu-xl": "32px",
       },
       boxShadow: {
-        "neu-out":
-          "8px 8px 16px rgba(75,60,160,0.30), -8px -8px 16px rgba(255,255,255,0.55)",
-        "neu-soft":
-          "6px 6px 14px rgba(75,60,160,0.18), -6px -6px 14px rgba(255,255,255,0.7)",
-        "neu-in":
-          "inset 4px 4px 8px rgba(75,60,160,0.18), inset -4px -4px 8px rgba(255,255,255,0.75)",
+        "neu-out": "var(--shadow-neu-out)",
+        "neu-soft": "var(--shadow-neu-soft)",
+        "neu-in": "var(--shadow-neu-in)",
         "neu-purple":
           "10px 10px 24px rgba(40,30,110,0.45), -8px -8px 20px rgba(140,120,240,0.18)",
         "neu-purple-in":

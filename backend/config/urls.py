@@ -48,6 +48,7 @@ urlpatterns = [
     path("api/settings/", include("apps.settings_app.urls")),
     path("api/notifications/", include("apps.notifications.urls")),
     path("api/documents/", include("apps.documents.urls")),
+    path("api/cart/", include("apps.cart.urls")),
 
     # Документация API.
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

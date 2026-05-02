@@ -1,6 +1,16 @@
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
 from simple_history.models import HistoricalRecords
+
+phone_validator = RegexValidator(
+    regex=r"^\+?[0-9\s\-()]{6,32}$",
+    message="Телефон должен содержать 6–32 символов: цифры, пробелы, +, -, ().",
+)
+inn_validator = RegexValidator(
+    regex=r"^[0-9]{6,20}$",
+    message="ИНН должен состоять из 6–20 цифр.",
+)
 
 
 class Client(models.Model):
@@ -25,9 +35,13 @@ class Client(models.Model):
     type = models.CharField(
         "Тип", max_length=20, choices=Type.choices, default=Type.PHYSICAL
     )
-    inn = models.CharField("ИНН", max_length=32, blank=True)
-    phone = models.CharField("Телефон", max_length=32, blank=True)
-    email = models.EmailField("Email", blank=True)
+    inn = models.CharField(
+        "ИНН", max_length=32, blank=True, validators=[inn_validator]
+    )
+    phone = models.CharField(
+        "Телефон", max_length=32, blank=True, validators=[phone_validator]
+    )
+    email = models.EmailField("Email", max_length=254, blank=True)
     address = models.TextField("Адрес", blank=True)
     segment = models.CharField(
         "Сегмент", max_length=20, choices=Segment.choices, default=Segment.RETAIL

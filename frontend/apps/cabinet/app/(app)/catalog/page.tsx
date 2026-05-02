@@ -71,17 +71,11 @@ export default function CatalogPage() {
               </span>
             </p>
             <button
-              onClick={() =>
-                addToCart({
-                  product_id: p.id,
-                  sku: p.sku,
-                  name: p.name,
-                  price: p.sale_price,
-                  quantity: 1,
-                })
-              }
+              type="button"
+              onClick={() => addToCart(p.id, 1).catch(() => {})}
               disabled={p.stock_status === "out_of_stock"}
-              className="w-full rounded-xl bg-[#8E7CF8] text-white py-2 disabled:opacity-50"
+              className="w-full rounded-xl bg-[#8E7CF8] text-white py-2 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5B47C9]"
+              aria-label={`Добавить ${p.name} в корзину`}
             >
               В корзину
             </button>

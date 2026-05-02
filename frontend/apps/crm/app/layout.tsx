@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "AquaLine CRM",
@@ -33,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        {children}
+        <Providers>{children}</Providers>
         <script
           dangerouslySetInnerHTML={{
             __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {})); }`,
