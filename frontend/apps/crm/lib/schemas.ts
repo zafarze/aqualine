@@ -5,16 +5,16 @@ const decimalString = (max = 12) =>
     .string()
     .trim()
     .regex(/^-?\d+([.,]\d{1,2})?$/, "Ожидается число (например, 12.50)")
-    .refine((s) => s.length <= max + 3, "Слишком большое число")
-    .transform((s) => s.replace(",", "."));
+    .refine((s: string) => s.length <= max + 3, "Слишком большое число")
+    .transform((s: string) => s.replace(",", "."));
 
 const nonNegativeDecimal = decimalString().refine(
-  (s) => parseFloat(s) >= 0,
+  (s: string) => parseFloat(s) >= 0,
   "Не может быть отрицательным"
 );
 
 const positiveDecimal = decimalString().refine(
-  (s) => parseFloat(s) > 0,
+  (s: string) => parseFloat(s) > 0,
   "Должно быть больше нуля"
 );
 
@@ -26,16 +26,16 @@ export const clientSchema = z.object({
   inn: z
     .string()
     .max(32)
-    .refine((s) => s === "" || /^[0-9]{6,20}$/.test(s), "ИНН: 6–20 цифр"),
+    .refine((s: string) => s === "" || /^[0-9]{6,20}$/.test(s), "ИНН: 6–20 цифр"),
   phone: z
     .string()
     .max(32)
-    .refine((s) => s === "" || phoneRegex.test(s), "Некорректный телефон"),
+    .refine((s: string) => s === "" || phoneRegex.test(s), "Некорректный телефон"),
   email: z
     .string()
     .max(254)
     .refine(
-      (s) => s === "" || z.string().email().safeParse(s).success,
+      (s: string) => s === "" || z.string().email().safeParse(s).success,
       "Некорректный email"
     ),
   address: z.string().max(2000).optional().default(""),
@@ -61,7 +61,7 @@ export const orderItemSchema = z.object({
   product: z.number({ invalid_type_error: "Выберите товар" }).int().positive(),
   quantity: positiveDecimal,
   price: nonNegativeDecimal,
-  discount: decimalString().refine((s) => {
+  discount: decimalString().refine((s: string) => {
     const n = parseFloat(s);
     return n >= 0 && n <= 100;
   }, "Скидка 0–100%"),
@@ -81,7 +81,7 @@ export const orderSchema = z.object({
   due_date: z
     .string()
     .nullable()
-    .refine((s) => {
+    .refine((s: string | null) => {
       if (!s) return true;
       const d = new Date(s);
       const today = new Date();
