@@ -4,6 +4,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { api, type Paginated } from "./api";
 import type { Client, ClientInput, Order, OrderInput, Product, ProductInput } from "./types";
 
@@ -113,8 +114,6 @@ export function useSaveOrder(id?: number) {
 }
 
 // ─── Generic debounce hook ───────────────────────────────────────────────
-
-import { useEffect, useState } from "react";
 
 export function useDebounced<T>(value: T, delay = 300): T {
   const [v, setV] = useState(value);
