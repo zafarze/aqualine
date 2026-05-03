@@ -30,21 +30,34 @@ jobs:
         with:
           workload_identity_provider: ${{ env.WIF_PROVIDER }}
           service_account: ${{ env.SA_EMAIL }}
+          token_format: access_token
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      - name: Build & push image via Cloud Build
-        working-directory: backend
-        run: |
-          gcloud builds submit \
-            --tag="${IMAGE}:${GITHUB_SHA::7}" \
-            --project="${PROJECT_ID}" \
-            --quiet
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: europe-west1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Compute image tag
+        id: tag
+        run: echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+            ${{ env.IMAGE }}:latest
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy "${CLOUD_RUN_SERVICE}" \
-            --image="${IMAGE}:${GITHUB_SHA::7}" \
+            --image="${IMAGE}:${{ steps.tag.outputs.tag }}" \
             --region="${REGION}" \
             --project="${PROJECT_ID}" \
             --quiet
