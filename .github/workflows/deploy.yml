@@ -1,0 +1,83 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: aqualine-tj
+  REGION: europe-west1
+  WIF_PROVIDER: projects/380030008939/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+  SA_EMAIL: github-deployer@aqualine-tj.iam.gserviceaccount.com
+  IMAGE: europe-west1-docker.pkg.dev/aqualine-tj/aqualine/backend
+  CLOUD_RUN_SERVICE: aqualine-backend
+  BACKEND_URL: https://aqualine-backend-380030008939.europe-west1.run.app
+
+jobs:
+  backend:
+    name: Backend → Cloud Run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build & push image via Cloud Build
+        working-directory: backend
+        run: |
+          gcloud builds submit \
+            --tag="${IMAGE}:${GITHUB_SHA::7}" \
+            --project="${PROJECT_ID}" \
+            --quiet
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${CLOUD_RUN_SERVICE}" \
+            --image="${IMAGE}:${GITHUB_SHA::7}" \
+            --region="${REGION}" \
+            --project="${PROJECT_ID}" \
+            --quiet
+
+  frontend:
+    name: Frontend → Firebase Hosting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install packages/ui deps
+        working-directory: frontend/packages/ui
+        run: npm install --no-audit --no-fund
+
+      - name: Install web app deps
+        working-directory: frontend/web
+        run: npm install --no-audit --no-fund
+
+      - name: Build
+        working-directory: frontend/web
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ env.BACKEND_URL }}/api
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SA_EMAIL }}
+
+      - name: Deploy to Firebase Hosting
+        run: npx --yes firebase-tools@13 deploy --only hosting --project "${PROJECT_ID}" --non-interactive
