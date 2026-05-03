@@ -61,8 +61,10 @@ function DefaultLink({ href, children, ...rest }: LinkProps) {
   );
 }
 
-function isActive(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
+function isActive(pathname: string, href: string, homeHref: string): boolean {
+  // Домашний пункт меню активен только при точном совпадении пути,
+  // иначе его префикс «съедает» все вложенные маршруты.
+  if (href === homeHref) return pathname === homeHref;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -158,7 +160,7 @@ export function Sidebar({
         <nav className="flex flex-col gap-1.5 p-4 flex-1 overflow-y-auto" aria-label="Главное меню">
           {items.map((item) => {
             const Icon = item.icon;
-            const active = isActive(currentPath, item.href);
+            const active = isActive(currentPath, item.href, homeHref);
             return (
               <LinkComponent
                 key={item.href}
