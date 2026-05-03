@@ -28,6 +28,10 @@ ALLOWED_HOSTS = [
     for h in env("DJANGO_ALLOWED_HOSTS", default="").split(",")
     if h.strip()
 ]
+# Railway exposes the public domain at runtime — auto-trust it.
+_railway_domain = env("RAILWAY_PUBLIC_DOMAIN", default="")
+if _railway_domain and _railway_domain not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_railway_domain)
 if not DEBUG:
     if not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS:
         raise environ.ImproperlyConfigured(
@@ -204,6 +208,10 @@ if not DEBUG:
         for o in env("CSRF_TRUSTED_ORIGINS", default="").split(",")
         if o.strip()
     ]
+    if _railway_domain:
+        _railway_origin = f"https://{_railway_domain}"
+        if _railway_origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(_railway_origin)
 
 # Web Push (VAPID)
 VAPID_PUBLIC_KEY = env("VAPID_PUBLIC_KEY", default="")
