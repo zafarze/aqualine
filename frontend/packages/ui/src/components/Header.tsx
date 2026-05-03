@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   Bell,
   Boxes,
@@ -245,7 +244,7 @@ function SearchBox({
                       const meta = SEARCH_TYPE_META[r.type];
                       const Icon = meta.icon;
                       return (
-                        <Link
+                        <a
                           key={r.url}
                           href={r.url}
                           onClick={() => {
@@ -270,7 +269,7 @@ function SearchBox({
                               {r.subtitle}
                             </div>
                           </div>
-                        </Link>
+                        </a>
                       );
                     })}
                   </div>
@@ -402,7 +401,7 @@ function NotificationsButton({
               <ul className="py-1">
                 {items.map((n) => (
                   <li key={n.id}>
-                    <Link
+                    <a
                       href={n.url}
                       onClick={() => setOpen(false)}
                       className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition"
@@ -426,7 +425,7 @@ function NotificationsButton({
                           {timeAgo(n.created_at)} назад
                         </div>
                       </div>
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -515,14 +514,14 @@ function ProfileMenu({
             </div>
           </div>
           <div className="py-1">
-            <Link
+            <a
               href={profileHref}
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-slate-50 transition"
             >
               <UserIcon size={16} className="text-ink-soft" />
               Мой профиль
-            </Link>
+            </a>
             {onLogout ? (
               <button
                 type="button"

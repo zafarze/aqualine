@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   ChevronDown,
   ChevronLeft,
@@ -16,7 +14,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, type ComponentType, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 interface SidebarItem {
@@ -36,11 +34,31 @@ const defaultItems: SidebarItem[] = [
   { icon: Settings, label: "Настройки", href: "/settings" },
 ];
 
+interface LinkProps {
+  href: string;
+  className?: string;
+  children?: ReactNode;
+  [key: string]: unknown;
+}
+
 interface SidebarProps {
   items?: SidebarItem[];
   onLogout?: () => void;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  /** Текущий путь. По умолчанию — window.location.pathname (только в браузере). */
+  pathname?: string;
+  /** Компонент-обёртка для ссылок (например, react-router-dom Link). По умолчанию — <a>. */
+  LinkComponent?: ComponentType<LinkProps>;
+  homeHref?: string;
+}
+
+function DefaultLink({ href, children, ...rest }: LinkProps) {
+  return (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  );
 }
 
 function isActive(pathname: string, href: string): boolean {
@@ -53,16 +71,18 @@ export function Sidebar({
   onLogout,
   mobileOpen = false,
   onMobileClose,
+  pathname,
+  LinkComponent = DefaultLink,
+  homeHref = "/",
 }: SidebarProps) {
-  const pathname = usePathname() ?? "/";
+  const currentPath =
+    pathname ?? (typeof window !== "undefined" ? window.location.pathname : "/");
 
-  // Закрывать мобильный сайдбар при смене маршрута
   useEffect(() => {
     if (mobileOpen && onMobileClose) onMobileClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [currentPath]);
 
-  // Закрытие по Escape
   useEffect(() => {
     if (!mobileOpen || !onMobileClose) return;
     const onKey = (e: KeyboardEvent) => {
@@ -72,7 +92,6 @@ export function Sidebar({
     return () => document.removeEventListener("keydown", onKey);
   }, [mobileOpen, onMobileClose]);
 
-  // Блокируем скролл body на мобильном при открытом сайдбаре
   useEffect(() => {
     if (typeof document === "undefined") return;
     if (mobileOpen) {
@@ -86,45 +105,36 @@ export function Sidebar({
 
   return (
     <>
-      {/* Backdrop для мобильного */}
       <div
         onClick={onMobileClose}
         aria-hidden
         className={cn(
           "lg:hidden fixed inset-0 bg-ink/40 backdrop-blur-sm z-40 transition-opacity",
-          mobileOpen
-            ? "opacity-100"
-            : "opacity-0 pointer-events-none",
+          mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none",
         )}
       />
 
       <aside
         className={cn(
           "shrink-0 bg-white border border-slate-100 flex flex-col overflow-hidden",
-          // Mobile: floating card off-canvas
           "fixed top-3 bottom-3 left-3 z-50 w-[min(16rem,calc(100vw-1.5rem))] rounded-2xl shadow-[0_20px_50px_-12px_rgba(108,92,231,0.35)] transition-transform duration-300",
           mobileOpen ? "translate-x-0" : "-translate-x-[calc(100%+1rem)]",
-          // Desktop: sticky card
           "lg:static lg:inset-auto lg:w-64 lg:translate-x-0 lg:max-h-[calc(100vh-3rem)] lg:sticky lg:top-6 lg:shadow-[0_4px_24px_-6px_rgba(108,92,231,0.08)]",
         )}
       >
-        {/* ───── Лого + закрыть ───── */}
         <div className="relative px-5 pt-6 pb-5">
-          <Link href="/" className="flex flex-col items-center gap-2.5">
+          <LinkComponent href={homeHref} className="flex flex-col items-center gap-2.5">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-violet to-accent-pink grid place-items-center text-white font-bold text-3xl shadow-lg shadow-accent-violet/30">
               A
             </div>
             <div className="text-center">
-              <div className="text-base font-bold text-ink leading-tight">
-                AquaLine
-              </div>
+              <div className="text-base font-bold text-ink leading-tight">AquaLine</div>
               <div className="text-[10px] text-ink-soft uppercase tracking-[0.2em] mt-0.5">
                 CRM-портал
               </div>
             </div>
-          </Link>
+          </LinkComponent>
 
-          {/* Кнопка закрытия (моб) */}
           <button
             type="button"
             onClick={onMobileClose}
@@ -134,7 +144,6 @@ export function Sidebar({
             <X size={16} />
           </button>
 
-          {/* Кнопка свернуть (десктоп) — пока декоративная */}
           <button
             type="button"
             aria-label="Свернуть меню"
@@ -146,16 +155,12 @@ export function Sidebar({
 
         <div className="border-t border-slate-100 mx-5" />
 
-        {/* ───── Меню ───── */}
-        <nav
-          className="flex flex-col gap-1.5 p-4 flex-1 overflow-y-auto"
-          aria-label="Главное меню"
-        >
+        <nav className="flex flex-col gap-1.5 p-4 flex-1 overflow-y-auto" aria-label="Главное меню">
           {items.map((item) => {
             const Icon = item.icon;
-            const active = isActive(pathname, item.href);
+            const active = isActive(currentPath, item.href);
             return (
-              <Link
+              <LinkComponent
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
@@ -177,12 +182,11 @@ export function Sidebar({
                     )}
                   />
                 ) : null}
-              </Link>
+              </LinkComponent>
             );
           })}
         </nav>
 
-        {/* ───── Выход ───── */}
         {onLogout ? (
           <>
             <div className="border-t border-slate-100 mx-5" />

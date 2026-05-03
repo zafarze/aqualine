@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react";
 import { cn } from "../lib/cn";
 
@@ -92,9 +91,9 @@ export function StatCard({
 
   if (href) {
     return (
-      <Link href={href} className={className}>
+      <a href={href} className={className}>
         {inner}
-      </Link>
+      </a>
     );
   }
 

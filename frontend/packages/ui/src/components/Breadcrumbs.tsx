@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
 import { Fragment } from "react";
 import { cn } from "../lib/cn";
@@ -22,25 +21,25 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
         className,
       )}
     >
-      <Link
+      <a
         href="/"
         className="inline-flex items-center gap-1.5 hover:text-ink transition"
       >
         <Home size={14} />
         <span className="sr-only">Главная</span>
-      </Link>
+      </a>
       {items.map((item, i) => {
         const isLast = i === items.length - 1;
         return (
           <Fragment key={i}>
             <ChevronRight size={14} className="text-ink-dim shrink-0" />
             {!isLast && item.href ? (
-              <Link
+              <a
                 href={item.href}
                 className="hover:text-ink transition truncate max-w-[180px]"
               >
                 {item.label}
-              </Link>
+              </a>
             ) : (
               <span
                 className={cn(
